@@ -13,12 +13,14 @@ require 'mail'
 module Griddler::EmailParser
   def self.parse_address(full_address)
     email_address = extract_email_address(full_address)
+    name = extract_name(full_address)
     token, host = split_address(email_address)
     {
       token: token,
       host: host,
       email: email_address,
       full: full_address,
+      name: name,
     }
   end
 
@@ -58,6 +60,12 @@ module Griddler::EmailParser
 
   def self.extract_email_address(full_address)
     full_address.split('<').last.delete('>').strip
+  end
+
+  def self.extract_name(full_address)
+    full_address = full_address.strip
+    name = full_address.split('<').first.strip
+    return name unless name == full_address || name.empty?
   end
 
   def self.split_address(email_address)

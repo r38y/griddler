@@ -317,27 +317,33 @@ describe Griddler::Email, 'extracting email addresses' do
       email: 'bob@example.com',
       token: 'bob',
       host: 'example.com',
+      name: 'Bob',
     }
     @address = @hash[:email]
   end
 
+  it 'extracts the name' do
+    email = Griddler::Email.new(to: ["Tyler <#{@address}>"], from: @address).process
+    email.to.should eq [@hash.merge(name: 'Tyler', full: "Tyler <#{@address}>")]
+  end
+
   it 'handles normal e-mail address' do
     email = Griddler::Email.new(text: 'hi', to: [@address], from: @address).process
-    email.to.should eq [@hash.merge(full: @address)]
+    email.to.should eq [@hash.merge(full: @address, name: nil)]
     email.from.should eq @address
   end
 
   it 'handles new lines' do
     email = Griddler::Email.new(text: 'hi', to: ["#{@address}\n"],
       from: "#{@address}\n").process
-    email.to.should eq [@hash.merge(full: "#{@address}\n")]
+    email.to.should eq [@hash.merge(full: "#{@address}\n", name: nil)]
     email.from.should eq @address
   end
 
   it 'handles angle brackets around address' do
     email = Griddler::Email.new(text: 'hi', to: ["<#{@address}>"],
       from: "<#{@address}>").process
-    email.to.should eq [@hash.merge(full: "<#{@address}>")]
+    email.to.should eq [@hash.merge(full: "<#{@address}>", name: nil)]
     email.from.should eq @address
   end
 
@@ -354,7 +360,7 @@ describe Griddler::Email, 'extracting email addresses' do
       to: ["fake@example.com <#{@address}>"],
       from: "fake@example.com <#{@address}>"
     ).process
-    email.to.should eq [@hash.merge(full: "fake@example.com <#{@address}>")]
+    email.to.should eq [@hash.merge(full: "fake@example.com <#{@address}>", name: 'fake@example.com')]
     email.from.should eq @address
   end
 end
@@ -443,6 +449,7 @@ describe Griddler::Email, 'with custom configuration' do
         host: 'example.com',
         email: 'some-identifier@example.com',
         full: 'Some Identifier <some-identifier@example.com>',
+        name: 'Some Identifier',
       }
 
       email.to.first.should be_an_instance_of(Hash)
