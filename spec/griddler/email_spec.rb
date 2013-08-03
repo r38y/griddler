@@ -313,11 +313,11 @@ end
 describe Griddler::Email, 'extracting email addresses' do
   before do
     @hash = {
-      full: 'Bob <bob@example.com>',
+      full: '<bob@example.com>',
       email: 'bob@example.com',
       token: 'bob',
       host: 'example.com',
-      name: 'Bob',
+      name: nil,
     }
     @address = @hash[:email]
   end
@@ -329,28 +329,28 @@ describe Griddler::Email, 'extracting email addresses' do
 
   it 'handles normal e-mail address' do
     email = Griddler::Email.new(text: 'hi', to: [@address], from: @address).process
-    email.to.should eq [@hash.merge(full: @address, name: nil)]
+    email.to.should eq [@hash.merge(full: @address)]
     email.from.should eq @address
   end
 
   it 'handles new lines' do
     email = Griddler::Email.new(text: 'hi', to: ["#{@address}\n"],
       from: "#{@address}\n").process
-    email.to.should eq [@hash.merge(full: "#{@address}\n", name: nil)]
+    email.to.should eq [@hash.merge(full: "#{@address}\n")]
     email.from.should eq @address
   end
 
   it 'handles angle brackets around address' do
     email = Griddler::Email.new(text: 'hi', to: ["<#{@address}>"],
       from: "<#{@address}>").process
-    email.to.should eq [@hash.merge(full: "<#{@address}>", name: nil)]
+    email.to.should eq [@hash.merge(full: "<#{@address}>")]
     email.from.should eq @address
   end
 
   it 'handles name and angle brackets around address' do
     email = Griddler::Email.new(text: 'hi', to: ["Bob <#{@address}>"],
       from: "Bob <#{@address}>").process
-    email.to.should eq [@hash]
+    email.to.should eq [@hash.merge(name: 'Bob', full: "Bob <#{@address}>")]
     email.from.should eq @address
   end
 
