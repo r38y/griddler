@@ -82,7 +82,7 @@ that responds to:
 
 Each of those has some sensible defaults.
 
-`.from`, `.raw_body`, `.raw_headers`, and `.subject` will contain the obvious
+`.raw_body`, `.raw_headers`, and `.subject` will contain the obvious
 values found in the email, the raw values from those fields.
 
 `.body` will contain the full contents of the email body **unless** there is a
@@ -105,6 +105,9 @@ information of each recipient:
   * `full`: The whole recipient field. E.g, `Some User <hello@example.com>`
   * `name`: The name of the recipient. E.g, `Some User`
 
+`.from` behaves similar to `.to` but returns a hash instead of an array
+of hashes.
+
 `.attachments` will contain an array of attachments as multipart/form-data files
 which can be passed off to attachment libraries like Carrierwave or Paperclip.
 
@@ -125,6 +128,7 @@ Griddler.configure do |config|
   # :email  => 's13.6b2d13dc6a1d33db7644@mail.myapp.com'
   # :token  => 's13.6b2d13dc6a1d33db7644'
   # :hash   => { full: '', email: '', token: '', host: '', name: '' }
+  config.from = :hash # :token, :full, :email (default)
   config.reply_delimiter = '-- REPLY ABOVE THIS LINE --'
   config.email_service = :sendgrid
 end
@@ -134,6 +138,8 @@ end
 * `config.reply_delimiter` is the string searched for that will split your body.
 * `config.to` is the format of the returned value for the `:to` key in
 the email object. `:hash` will return all options within a -- (surprise!) -- hash.
+* `config.from` is the format of the returned value for the `:from` key in
+the email object. It behaves identical to `config.to`.
 * `config.email_service` tells Griddler which email service you are using. The supported
 email service options are `:sendgrid` (the default), `:cloudmailin` (expects
 multipart format), `:postmark` and `:mandrill`.

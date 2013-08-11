@@ -33,6 +33,14 @@ module Griddler
       @to = type
     end
 
+    def from
+      @from ||= :email
+    end
+
+    def from=(type)
+      @from = type
+    end
+
     def processor_class
       @processor_class ||= EmailProcessor
     end
