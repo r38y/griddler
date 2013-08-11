@@ -484,6 +484,50 @@ describe Griddler::Email, 'with custom configuration' do
     end
   end
 
+  describe 'from = :hash' do
+    it 'returns a hash for email.from' do
+      Griddler.configuration.stub(from: :hash)
+      email = Griddler::Email.new(params).process
+      expected_hash = {
+        token: 'joeuser',
+        host: 'example.com',
+        email: 'joeuser@example.com',
+        full: 'Joe User <joeuser@example.com>',
+        name: 'Joe User',
+      }
+
+      email.from.should be_an_instance_of(Hash)
+      email.from.should eq expected_hash
+    end
+  end
+
+  describe 'from = :full' do
+    it 'returns the full from for email.from' do
+      Griddler.configuration.stub(from: :full)
+      email = Griddler::Email.new(params).process
+
+      email.from.should eq params[:from]
+    end
+  end
+
+  describe 'from = :email' do
+    it 'returns just the email address for email.from' do
+      Griddler.configuration.stub(from: :email)
+      email = Griddler::Email.new(params).process
+
+      email.from.should eq 'joeuser@example.com'
+    end
+  end
+
+  describe 'from = :token' do
+    it 'returns the local portion of the email for email.from' do
+      Griddler.configuration.stub(from: :token)
+      email = Griddler::Email.new(params).process
+
+      email.from.should eq 'joeuser'
+    end
+  end
+
   describe 'processor_class' do
     it 'calls process on the custom processor class' do
       my_handler = double

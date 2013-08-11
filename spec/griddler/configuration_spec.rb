@@ -9,6 +9,7 @@ describe Griddler::Configuration do
     it 'provides defaults' do
       Griddler.configuration.processor_class.should eq(EmailProcessor)
       Griddler.configuration.to.should eq(:hash)
+      Griddler.configuration.from.should eq(:email)
       Griddler.configuration.reply_delimiter.should eq('Reply ABOVE THIS LINE')
       Griddler.configuration.email_service.should eq(Griddler::Adapters::SendgridAdapter)
     end
@@ -22,9 +23,11 @@ describe Griddler::Configuration do
     it 'stores config' do
       Griddler.configure do |config|
         config.to = :full
+        config.from = :hash
       end
 
       Griddler.configuration.to.should eq :full
+      Griddler.configuration.from.should eq :hash
     end
 
     it 'warns when setting token' do
