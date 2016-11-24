@@ -868,3 +868,17 @@ This is the real text\r\n\r\nOn Tue, Jun 14, 2016 at 10:25 AM Someone <\r\nveryl
     end
   end
 end
+
+describe Griddler::Email, 'with bonus fields' do
+  it 'defaults to empty hash' do
+    params = {to: ['hi@example.com']}
+    email = Griddler::Email.new(params)
+    expect(email.bonus).to eq({})
+  end
+
+  it 'passes through the bonus hash' do
+    params = {to: ['hi@example.com'], bonus: {original_recipient: 'john@example.com'}}
+    email = Griddler::Email.new(params)
+    expect(email.bonus).to eq({original_recipient: 'john@example.com'})
+  end
+end
